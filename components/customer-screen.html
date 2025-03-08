@@ -1,0 +1,40 @@
+<header>
+    <h1>Фермерский рынок выходного дня</h1>
+</header>
+<nav>
+    <button onclick="showCustomerTab('markets')" class="active" id="markets-tab-btn">Рынки</button>
+    <button onclick="showCustomerTab('catalog')" id="catalog-tab-btn">Каталог товаров</button>
+    <button onclick="showCustomerTab('farmers')" id="farmers-tab-btn">Фермеры</button>
+    <button onclick="showCustomerTab('cart')" id="cart-tab-btn">Корзина <span class="badge">3</span></button>
+    <button onclick="showCustomerTab('orders')" id="orders-tab-btn">Мои заказы</button>
+</nav>
+<main>
+    <!-- Вкладка Рынки -->
+    <div id="markets-tab" class="tab-content active">
+        <h2>Предстоящие рынки выходного дня</h2>
+        <div class="market-date">
+            <div class="market-info">
+                <h3>Суббота, 15 марта 2025</h3>
+                <p>Площадь Ленина, 10:00 - 16:00</p>
+                <p>Участвуют 15 фермеров</p>
+            </div>
+            <div class="market-actions">
+                <button onclick="showCustomerTab('catalog')">Просмотреть товары</button>
+            </div>
+        </div>
+        <!-- Дополнительные рынки... -->
+        
+        <h2 style="margin-top: 2rem;">Актуальные акции</h2>
+        <div class="product-grid">
+            <!-- Акционные товары... -->
+            <!-- Вставьте здесь содержимое из components/promo-items.js -->
+        </div>
+    </div>
+    
+    <!-- Вкладка Каталог товаров -->
+    <div id="catalog-tab" class="tab-content">
+        <!-- Содержимое каталога товаров... -->
+    </div>
+    
+    <!-- Остальные вкладки... -->
+</main>
