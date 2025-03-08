@@ -4,7 +4,491 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Фермерский рынок выходного дня</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        :root {
+            --primary: #4caf50;
+            --primary-dark: #388e3c;
+            --secondary: #ff9800;
+            --light-grey: #f5f5f5;
+            --medium-grey: #e0e0e0;
+            --dark-grey: #757575;
+            --text-dark: #333333;
+            --text-light: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--text-dark);
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: var(--text-light);
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--primary-dark);
+            padding: 0.5rem;
+        }
+        
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        nav button:hover, nav button.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-dark);
+        }
+        
+        .market-date {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .market-info {
+            flex-grow: 1;
+        }
+        
+        .market-actions button {
+            background-color: var(--secondary);
+            color: var(--text-dark);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .farm-card {
+            display: flex;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .farm-image {
+            width: 100px;
+            height: 100px;
+            background-color: var(--medium-grey);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .farm-info {
+            padding: 1rem;
+            flex-grow: 1;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .product-image {
+            height: 150px;
+            background-color: var(--medium-grey);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .product-info {
+            padding: 1rem;
+        }
+        
+        .product-price {
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+        
+        .product-farm {
+            font-size: 0.8rem;
+            color: var(--dark-grey);
+        }
+        
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+        }
+        
+        .product-actions button {
+            background-color: var(--primary);
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            flex-grow: 1;
+            margin-right: 0.5rem;
+        }
+        
+        .product-actions button:last-child {
+            margin-right: 0;
+            background-color: var(--secondary);
+        }
+        
+        .filter-bar {
+            display: flex;
+            margin-bottom: 1rem;
+            background-color: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .filter-bar select, .filter-bar input {
+            margin-right: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid var(--medium-grey);
+            border-radius: 4px;
+        }
+        
+        .filter-bar input {
+            flex-grow: 1;
+        }
+        
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-grey);
+        }
+        
+        .cart-item-info {
+            flex-grow: 1;
+            padding: 0 1rem;
+        }
+        
+        .cart-item-farm {
+            font-size: 0.8rem;
+            color: var(--dark-grey);
+        }
+        
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .cart-item-actions button {
+            background-color: var(--light-grey);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .cart-item-actions span {
+            margin: 0 0.5rem;
+        }
+        
+        .cart-summary {
+            background-color: var(--light-grey);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .cart-summary button {
+            background-color: var(--primary);
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .order-success {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .order-success h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .back-button {
+            background-color: var(--primary);
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--medium-grey);
+            border-radius: 4px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        
+        .form-actions button {
+            background-color: var(--primary);
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .form-actions a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .farmer-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+        
+        .order-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .order-customer {
+            font-weight: bold;
+        }
+        
+        .order-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .order-status.pending {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+        
+        .order-status.confirmed {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tab {
+            padding: 1rem;
+            flex-grow: 1;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .farm-image {
+                width: 80px;
+                height: 80px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav {
+                flex-wrap: wrap;
+            }
+            
+            nav button {
+                flex-grow: 1;
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        .user-type-selection {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        
+        .user-type-button {
+            background-color: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 1rem 2rem;
+            margin: 0 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .user-type-button:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .badge {
+            display: inline-block;
+            background-color: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            text-align: center;
+            line-height: 20px;
+            margin-left: 5px;
+        }
+    </style>
 </head>
 <body>
     <!-- Начальный экран выбора типа пользователя -->
@@ -18,6 +502,731 @@
                 <button class="user-type-button" onclick="showScreen('login-screen'); setUserType('customer')">Я покупатель</button>
                 <button class="user-type-button" onclick="showScreen('login-screen'); setUserType('farmer')">Я фермер</button>
                 <button class="user-type-button" onclick="showScreen('login-screen'); setUserType('admin')">Администратор рынка</button>
+            </div>
+
+    <script>
+        // Переменная для хранения типа пользователя
+        let userType = '';
+        
+        // Функция для переключения экранов
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        // Функция для установки типа пользователя
+        function setUserType(type) {
+            userType = type;
+            document.getElementById('login-title').textContent = `Вход для ${type === 'customer' ? 'покупателя' : type === 'farmer' ? 'фермера' : 'администратора'}`;
+        }
+        
+        // Функция для входа в систему
+        function login() {
+            if (userType === 'customer') {
+                showScreen('customer-screen');
+            } else if (userType === 'farmer') {
+                showScreen('farmer-screen');
+            } else if (userType === 'admin') {
+                showScreen('admin-screen');
+            }
+        }
+        
+        // Функции для работы с вкладками клиента
+        function showCustomerTab(tabId) {
+            // Сначала деактивируем все кнопки и вкладки
+            document.querySelectorAll('#customer-screen nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('#customer-screen .tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Затем активируем нужную кнопку и вкладку
+            document.getElementById(`${tabId}-tab-btn`).classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+            
+            // Отдельная обработка для успешного оформления заказа
+            if (tabId === 'order-success') {
+                document.getElementById('order-success').classList.add('active');
+            }
+        }
+        
+        // Функции для работы с вкладками фермера
+        function showFarmerTab(tabId) {
+            document.querySelectorAll('#farmer-screen nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('#farmer-screen .tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(`${tabId}-tab-btn`).classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        }
+        
+        // Функции для работы с подвкладками товаров
+        function showProductsSubTab(tabId) {
+            document.querySelectorAll('#products-tab .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('#products-tab .tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        // Функции для работы с подвкладками заказов
+        function showOrdersSubTab(tabId) {
+            document.querySelectorAll('#farmer-orders-tab .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('#farmer-orders-tab .tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        // Функции для работы с вкладками администратора
+        function showAdminTab(tabId) {
+            document.querySelectorAll('#admin-screen nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('#admin-screen .tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(`${tabId}-tab-btn`).classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        }
+        
+        // Функции для работы с подвкладками рынков
+        function showMarketSubTab(tabId) {
+            document.querySelectorAll('#admin-markets-tab .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('#admin-markets-tab .tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        // Функция для добавления товара в корзину
+        function addToCart() {
+            alert('Товар добавлен в корзину');
+        }
+        
+        // Функция для обновления количества товара в корзине
+        function updateQuantity(button, change) {
+            const quantityElement = button.parentElement.querySelector('span');
+            let quantity = parseInt(quantityElement.textContent);
+            
+            quantity += change;
+            if (quantity < 1) {
+                if (confirm('Удалить товар из корзины?')) {
+                    button.closest('.cart-item').remove();
+                } else {
+                    quantity = 1;
+                }
+            }
+            
+            quantityElement.textContent = quantity;
+        }
+        
+        // Функция для оформления заказа
+        function submitOrder() {
+            showCustomerTab('order-success');
+        }
+    </script>
+</body>
+</html>
+    
+    <!-- Основной экран администратора рынка -->
+    <div id="admin-screen" class="screen">
+        <header>
+            <h1>Фермерский рынок выходного дня - Панель администратора</h1>
+        </header>
+        <nav>
+            <button onclick="showAdminTab('admin-dashboard')" class="active" id="admin-dashboard-tab-btn">Общая статистика</button>
+            <button onclick="showAdminTab('admin-markets')" id="admin-markets-tab-btn">Управление рынками</button>
+            <button onclick="showAdminTab('admin-farmers')" id="admin-farmers-tab-btn">Фермеры</button>
+            <button onclick="showAdminTab('admin-customers')" id="admin-customers-tab-btn">Клиенты</button>
+            <button onclick="showAdminTab('admin-settings')" id="admin-settings-tab-btn">Настройки</button>
+        </nav>
+        <main>
+            <!-- Вкладка Общая статистика -->
+            <div id="admin-dashboard-tab" class="tab-content active">
+                <h2>Общая статистика платформы</h2>
+                <div class="farmer-dashboard">
+                    <div class="stat-card">
+                        <p>Оборот за март</p>
+                        <p class="stat-value">387 500 ₽</p>
+                    </div>
+                
+                <div class="card" style="margin-top: 1rem;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: var(--light-grey);">
+                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--medium-grey);">Имя</th>
+                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--medium-grey);">Телефон</th>
+                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--medium-grey);">Заказов</th>
+                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--medium-grey);">Сумма</th>
+                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--medium-grey);">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">Иван Петров</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">+7 (999) 123-45-67</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">15</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">18,750 ₽</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">
+                                    <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Профиль</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">Анна Кузнецова</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">+7 (999) 987-65-43</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">8</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">12,400 ₽</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">
+                                    <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Профиль</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">Петр Сидоров</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">+7 (999) 111-22-33</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">12</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">15,800 ₽</td>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">
+                                    <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Профиль</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Вкладка Настройки -->
+            <div id="admin-settings-tab" class="tab-content">
+                <h2>Настройки платформы</h2>
+                
+                <div class="card">
+                    <h3 class="card-title">Общие настройки</h3>
+                    <div class="form-group">
+                        <label for="platform-name">Название платформы</label>
+                        <input type="text" id="platform-name" value="Фермерский рынок выходного дня">
+                    </div>
+                    <div class="form-group">
+                        <label for="platform-contact">Контактный телефон поддержки</label>
+                        <input type="tel" id="platform-contact" value="+7 (999) 999-99-99">
+                    </div>
+                    <div class="form-group">
+                        <label for="platform-email">Email поддержки</label>
+                        <input type="email" id="platform-email" value="support@farmermarket.ru">
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 class="card-title">Настройки уведомлений</h3>
+                    <div class="form-group" style="display: flex; align-items: center;">
+                        <input type="checkbox" id="notify-new-market" checked style="margin-right: 0.5rem;">
+                        <label for="notify-new-market">Уведомлять о новых рынках</label>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center;">
+                        <input type="checkbox" id="notify-orders" checked style="margin-right: 0.5rem;">
+                        <label for="notify-orders">Уведомлять о новых заказах</label>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center;">
+                        <input type="checkbox" id="notify-reminder" checked style="margin-right: 0.5rem;">
+                        <label for="notify-reminder">Отправлять напоминания</label>
+                    </div>
+                </div>
+                
+                <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem;" onclick="alert('Настройки сохранены')">Сохранить настройки</button>
+            </div>
+        </main>
+    </div>
+                    <div class="stat-card">
+                        <p>Активных фермеров</p>
+                        <p class="stat-value">23</p>
+                    </div>
+                    <div class="stat-card">
+                        <p>Клиентов</p>
+                        <p class="stat-value">452</p>
+                    </div>
+                    <div class="stat-card">
+                        <p>Заказов в этом месяце</p>
+                        <p class="stat-value">204</p>
+                    </div>
+                </div>
+                
+                <h3>Ближайшие рынки</h3>
+                <div class="market-date">
+                    <div class="market-info">
+                        <h3>Суббота, 15 марта 2025</h3>
+                        <p>Площадь Ленина, 10:00 - 16:00</p>
+                        <p>Участвуют 15 фермеров, 87 предзаказов</p>
+                    </div>
+                    <div class="market-actions">
+                        <button onclick="showAdminTab('admin-markets')">Подробнее</button>
+                    </div>
+                </div>
+                <div class="market-date">
+                    <div class="market-info">
+                        <h3>Воскресенье, 16 марта 2025</h3>
+                        <p>Парк Горького, 10:00 - 18:00</p>
+                        <p>Участвуют 20 фермеров, 64 предзаказа</p>
+                    </div>
+                    <div class="market-actions">
+                        <button onclick="showAdminTab('admin-markets')">Подробнее</button>
+                    </div>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 2rem;">Актуальные акции</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-image" style="position: relative;">
+                        Мёд
+                        <div style="position: absolute; top: 10px; right: 10px; background-color: #f44336; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold;">-30%</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Мёд цветочный</h3>
+                        <p class="product-farm">Хозяйство "Медовый рай"</p>
+                        <p class="product-price"><span style="text-decoration: line-through; color: #999;">600 ₽</span> 420 ₽ за 1 кг</p>
+                        <p style="font-size: 0.8rem; color: #f44336; margin-top: 5px;">Акция действует 15.03.2025 на рынке на Площади Ленина</p>
+                        <div class="product-actions">
+                            <button onclick="addToCart()">В корзину</button>
+                            <button onclick="alert('Информация о товаре: Цветочный мёд, сбор лето 2024. Последние 10 кг по акции!')">i</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image" style="position: relative;">
+                        Сыр
+                        <div style="position: absolute; top: 10px; right: 10px; background-color: #f44336; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold;">-25%</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Сыр Адыгейский</h3>
+                        <p class="product-farm">Ферма "Зеленый луг"</p>
+                        <p class="product-price"><span style="text-decoration: line-through; color: #999;">480 ₽</span> 360 ₽ за 500 г</p>
+                        <p style="font-size: 0.8rem; color: #f44336; margin-top: 5px;">Акция действует 16.03.2025 на рынке в Парке Горького</p>
+                        <div class="product-actions">
+                            <button onclick="addToCart()">В корзину</button>
+                            <button onclick="alert('Информация о товаре: Домашний адыгейский сыр из цельного молока. Мягкий, нежный.')">i</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image" style="position: relative;">
+                        Яблоки
+                        <div style="position: absolute; top: 10px; right: 10px; background-color: #f44336; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold;">2+1</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Яблоки Антоновка</h3>
+                        <p class="product-farm">Эко-ферма "Родник"</p>
+                        <p class="product-price">180 ₽ за 1 кг</p>
+                        <p style="font-size: 0.8rem; color: #f44336; margin-top: 5px;">При покупке 2 кг — 3-й кг в подарок! 15.03.2025, Площадь Ленина</p>
+                        <div class="product-actions">
+                            <button onclick="addToCart()">В корзину</button>
+                            <button onclick="alert('Информация о товаре: Яблоки сорта Антоновка, без обработки химикатами. Акция: при покупке 2 кг третий кг — бесплатно!')">i</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладка Управление рынками -->
+            <div id="admin-markets-tab" class="tab-content">
+                <h2>Управление рынками</h2>
+                <button style="margin-bottom: 1rem; background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">+ Создать новый рынок</button>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="showMarketSubTab('upcoming-markets')">Предстоящие</div>
+                    <div class="tab" onclick="showMarketSubTab('past-markets')">Прошедшие</div>
+                </div>
+                
+                <div id="upcoming-markets" class="tab-content active">
+                    <div class="market-date">
+                        <div class="market-info">
+                            <h3>Суббота, 15 марта 2025</h3>
+                            <p>Площадь Ленина, 10:00 - 16:00</p>
+                            <p>Участвуют 15 фермеров, 87 предзаказов</p>
+                        </div>
+                        <div class="market-actions">
+                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отменить</button>
+                        </div>
+                    </div>
+                    <div class="market-date">
+                        <div class="market-info">
+                            <h3>Воскресенье, 16 марта 2025</h3>
+                            <p>Парк Горького, 10:00 - 18:00</p>
+                            <p>Участвуют 20 фермеров, 64 предзаказа</p>
+                        </div>
+                        <div class="market-actions">
+                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отменить</button>
+                        </div>
+                    </div>
+                    <div class="market-date">
+                        <div class="market-info">
+                            <h3>Суббота, 22 марта 2025</h3>
+                            <p>Площадь Ленина, 10:00 - 16:00</p>
+                            <p>Участвуют 17 фермеров, 42 предзаказа</p>
+                        </div>
+                        <div class="market-actions">
+                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отменить</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="past-markets" class="tab-content">
+                    <div class="market-date">
+                        <div class="market-info">
+                            <h3>Суббота, 8 марта 2025</h3>
+                            <p>Площадь Ленина, 10:00 - 16:00</p>
+                            <p>Участвовало 18 фермеров, 92 заказа</p>
+                            <p><strong>Оборот:</strong> 124 500 ₽</p>
+                        </div>
+                        <div class="market-actions">
+                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отчёт</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладка Фермеры -->
+            <div id="admin-farmers-tab" class="tab-content">
+                <h2>Управление фермерами</h2>
+                <button style="margin-bottom: 1rem; background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">+ Добавить фермера</button>
+                
+                <div class="farm-card">
+                    <div class="farm-image">Фото</div>
+                    <div class="farm-info">
+                        <h3>Ферма "Зеленый луг"</h3>
+                        <p>Специализация: молочные продукты, выпечка</p>
+                        <p>Контакт: Иванов Иван, +7 (999) 123-45-67</p>
+                        <p><strong>Статус:</strong> Активный</p>
+                        <div style="display: flex; margin-top: 0.5rem;">
+                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Деактивировать</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="farm-card">
+                    <div class="farm-image">Фото</div>
+                    <div class="farm-info">
+                        <h3>Эко-ферма "Родник"</h3>
+                        <p>Специализация: овощи, фрукты, мясо</p>
+                        <p>Контакт: Петрова Анна, +7 (999) 987-65-43</p>
+                        <p><strong>Статус:</strong> Активный</p>
+                        <div style="display: flex; margin-top: 0.5rem;">
+                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Деактивировать</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="farm-card">
+                    <div class="farm-image">Фото</div>
+                    <div class="farm-info">
+                        <h3>Хозяйство "Медовый рай"</h3>
+                        <p>Специализация: мёд и продукты пчеловодства</p>
+                        <p>Контакт: Сидоров Алексей, +7 (999) 555-55-55</p>
+                        <p><strong>Статус:</strong> Активный</p>
+                        <div style="display: flex; margin-top: 0.5rem;">
+                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Деактивировать</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладка Клиенты -->
+            <div id="admin-customers-tab" class="tab-content">
+                <h2>База клиентов</h2>
+                <div class="filter-bar">
+                    <input type="text" placeholder="Поиск по имени или телефону...">
+                    <select>
+                        <option>Все клиенты</option>
+                        <option>Активные</option>
+                        <option>Новые</option>
+                        <option>Неактивные</option>
+                    </select>
+                    <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Применить</button>
+                </div>>
+            
+            <!-- Вкладка Заказы фермера -->
+            <div id="farmer-orders-tab" class="tab-content">
+                <h2>Заказы на мои товары</h2>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="showOrdersSubTab('pending-orders')">Новые (2)</div>
+                    <div class="tab" onclick="showOrdersSubTab('confirmed-orders')">Подтвержденные (13)</div>
+                    <div class="tab" onclick="showOrdersSubTab('completed-orders')">Выполненные</div>
+                </div>
+                
+                <div id="pending-orders" class="tab-content active">
+                    <div class="order-list-item">
+                        <div>
+                            <p class="order-customer">Иван П., тел. +7 (999) 123-45-67</p>
+                            <p>Заказ #1002 от 08.03.2025</p>
+                            <p>Товары: Молоко фермерское (2 л), Творог домашний (1 уп.)</p>
+                            <p>Сумма: 550 ₽</p>
+                            <p>Получение: Суббота, 15 марта 2025, Площадь Ленина</p>
+                        </div>
+                        <div>
+                            <span class="order-status pending">Новый</span>
+                            <div style="margin-top: 1rem;">
+                                <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Подтвердить</button>
+                                <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отклонить</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order-list-item">
+                        <div>
+                            <p class="order-customer">Анна К., тел. +7 (999) 987-65-43</p>
+                            <p>Заказ #1001 от 08.03.2025</p>
+                            <p>Товары: Хлеб на закваске (2 шт.)</p>
+                            <p>Сумма: 300 ₽</p>
+                            <p>Получение: Суббота, 15 марта 2025, Площадь Ленина</p>
+                        </div>
+                        <div>
+                            <span class="order-status pending">Новый</span>
+                            <div style="margin-top: 1rem;">
+                                <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Подтвердить</button>
+                                <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отклонить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="confirmed-orders" class="tab-content">
+                    <div class="order-list-item">
+                        <div>
+                            <p class="order-customer">Петр С., тел. +7 (999) 111-22-33</p>
+                            <p>Заказ #998 от 05.03.2025</p>
+                            <p>Товары: Молоко фермерское (3 л), Творог домашний (2 уп.)</p>
+                            <p>Сумма: 950 ₽</p>
+                            <p>Получение: Суббота, 15 марта 2025, Площадь Ленина</p>
+                        </div>
+                        <div>
+                            <span class="order-status confirmed">Подтвержден</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="completed-orders" class="tab-content">
+                    <p>Здесь будут отображаться выполненные заказы.</p>
+                </div>
+            </div>
+            
+            <!-- Вкладка Расписание -->
+            <div id="schedule-tab" class="tab-content">
+                <h2>Расписание рынков</h2>
+                
+                <div class="market-date">
+                    <div class="market-info">
+                        <h3>Суббота, 15 марта 2025</h3>
+                        <p>Площадь Ленина, 10:00 - 16:00</p>
+                        <p>Участвуют 15 фермеров</p>
+                        <p><strong>Статус:</strong> Участие подтверждено</p>
+                    </div>
+                    <div class="market-actions">
+                        <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отменить участие</button>
+                    </div>
+                </div>
+                <div class="market-date">
+                    <div class="market-info">
+                        <h3>Воскресенье, 16 марта 2025</h3>
+                        <p>Парк Горького, 10:00 - 18:00</p>
+                        <p>Участвуют 20 фермеров</p>
+                        <p><strong>Статус:</strong> Участие подтверждено</p>
+                    </div>
+                    <div class="market-actions">
+                        <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отменить участие</button>
+                    </div>
+                </div>
+                <div class="market-date">
+                    <div class="market-info">
+                        <h3>Суббота, 22 марта 2025</h3>
+                        <p>Площадь Ленина, 10:00 - 16:00</p>
+                        <p>Участвуют 17 фермеров</p>
+                        <p><strong>Статус:</strong> Требуется подтверждение</p>
+                    </div>
+                    <div class="market-actions">
+                        <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Подтвердить</button>
+                        <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отклонить</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладка Профиль фермера -->
+            <div id="profile-tab" class="tab-content">
+                <h2>Профиль фермы</h2>
+                <div class="card">
+                    <form>
+                        <div class="form-group">
+                            <label for="farm-name">Название фермы</label>
+                            <input type="text" id="farm-name" value="Ферма &quot;Зеленый луг&quot;">
+                        </div>
+                        <div class="form-group">
+                            <label for="farm-specialty">Специализация</label>
+                            <input type="text" id="farm-specialty" value="Молочные продукты, выпечка">
+                        </div>
+                        <div class="form-group">
+                            <label for="farm-description">Описание</label>
+                            <textarea id="farm-description" rows="4" style="width: 100%; padding: 0.5rem; border: 1px solid var(--medium-grey); border-radius: 4px;">Семейная ферма с традициями. Наши коровы питаются только экологически чистыми кормами. Производим натуральные молочные продукты и домашнюю выпечку.</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="farm-location">Расположение</label>
+                            <input type="text" id="farm-location" value="30 км от города">
+                        </div>
+                        <div class="form-group">
+                            <label for="farm-phone">Контактный телефон</label>
+                            <input type="tel" id="farm-phone" value="+7 (999) 123-45-67">
+                        </div>
+                        <button type="button" style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem;" onclick="alert('Профиль сохранен')">Сохранить изменения</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+        </main>
+    </div>
+    
+    <!-- Основной экран фермера -->
+    <div id="farmer-screen" class="screen">
+        <header>
+            <h1>Фермерский рынок выходного дня - Панель фермера</h1>
+        </header>
+        <nav>
+            <button onclick="showFarmerTab('dashboard')" class="active" id="dashboard-tab-btn">Статистика</button>
+            <button onclick="showFarmerTab('products')" id="products-tab-btn">Товары</button>
+            <button onclick="showFarmerTab('farmer-orders')" id="farmer-orders-tab-btn">Заказы <span class="badge">2</span></button>
+            <button onclick="showFarmerTab('schedule')" id="schedule-tab-btn">Расписание</button>
+            <button onclick="showFarmerTab('profile')" id="profile-tab-btn">Профиль</button>
+        </nav>
+        <main>
+            <!-- Вкладка Статистика -->
+            <div id="dashboard-tab" class="tab-content active">
+                <h2>Статистика фермы "Зеленый луг"</h2>
+                <div class="farmer-dashboard">
+                    <div class="stat-card">
+                        <p>Продажи за март</p>
+                        <p class="stat-value">45 800 ₽</p>
+                    </div>
+                    <div class="stat-card">
+                        <p>Активных заказов</p>
+                        <p class="stat-value">15</p>
+                    </div>
+                    <div class="stat-card">
+                        <p>Товаров в каталоге</p>
+                        <p class="stat-value">18</p>
+                    </div>
+                    <div class="stat-card">
+                        <p>Постоянных клиентов</p>
+                        <p class="stat-value">56</p>
+                    </div>
+                </div>
+                
+                <h3>Предстоящие рынки</h3>
+                <div class="market-date">
+                    <div class="market-info">
+                        <h3>Суббота, 15 марта 2025</h3>
+                        <p>Площадь Ленина, 10:00 - 16:00</p>
+                        <p>Заказов: 10</p>
+                    </div>
+                    <div class="market-actions">
+                        <button onclick="showFarmerTab('farmer-orders')">Просмотреть заказы</button>
+                    </div>
+                </div>
+                <div class="market-date">
+                    <div class="market-info">
+                        <h3>Воскресенье, 16 марта 2025</h3>
+                        <p>Парк Горького, 10:00 - 18:00</p>
+                        <p>Заказов: 5</p>
+                    </div>
+                    <div class="market-actions">
+                        <button onclick="showFarmerTab('farmer-orders')">Просмотреть заказы</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладка Товары -->
+            <div id="products-tab" class="tab-content">
+                <h2>Мои товары</h2>
+                <button style="margin-bottom: 1rem; background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">+ Добавить товар</button>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="showProductsSubTab('active-products')">Активные</div>
+                    <div class="tab" onclick="showProductsSubTab('draft-products')">Черновики</div>
+                    <div class="tab" onclick="showProductsSubTab('sold-products')">Распроданные</div>
+                </div>
+                
+                <div id="active-products" class="tab-content active">
+                    <div class="product-grid">
+                        <div class="product-card">
+                            <div class="product-image">Молоко</div>
+                            <div class="product-info">
+                                <h3>Молоко фермерское</h3>
+                                <p class="product-price">150 ₽ за 1 л</p>
+                                <p>В наличии: 50 л</p>
+                                <div class="product-actions">
+                                    <button onclick="alert('Редактирование товара')">Редактировать</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-card">
+                            <div class="product-image">Творог</div>
+                            <div class="product-info">
+                                <h3>Творог домашний</h3>
+                                <p class="product-price">250 ₽ за 500 г</p>
+                                <p>В наличии: 30 уп.</p>
+                                <div class="product-actions">
+                                    <button onclick="alert('Редактирование товара')">Редактировать</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-card">
+                            <div class="product-image">Хлеб</div>
+                            <div class="product-info">
+                                <h3>Хлеб на закваске</h3>
+                                <p class="product-price">150 ₽ за 1 шт</p>
+                                <p>В наличии: 25 шт.</p>
+                                <div class="product-actions">
+                                    <button onclick="alert('Редактирование товара')">Редактировать</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="draft-products" class="tab-content">
+                    <p>У вас нет товаров в черновиках.</p>
+                </div>
+                
+                <div id="sold-products" class="tab-content">
+                    <div class="product-card">
+                        <div class="product-image">Сметана</div>
+                        <div class="product-info">
+                            <h3>Сметана домашняя</h3>
+                            <p class="product-price">180 ₽ за 300 г</p>
+                            <p>Статус: распродано</p>
+                            <div class="product-actions">
+                                <button onclick="alert('Товар добавлен в активные')">Восстановить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -48,51 +1257,1162 @@
     
     <!-- Основной экран клиента -->
     <div id="customer-screen" class="screen">
-        <!-- Содержимое экрана клиента загружается из customer-screen.html -->
-    </div>
-    
-    <!-- Основной экран фермера -->
-    <div id="farmer-screen" class="screen">
-        <!-- Содержимое экрана фермера загружается из farmer-screen.html -->
-    </div>
-    
-    <!-- Основной экран администратора рынка -->
-    <div id="admin-screen" class="screen">
-        <!-- Содержимое экрана администратора загружается из admin-screen.html -->
-    </div>
-
-    <!-- Кнопка "На главную" в верхнем правом углу -->
-    <div class="top-home-button">
-        <button onclick="showScreen('user-selection-screen')" title="На главную">
-            На главную
-        </button>
-    </div>
-
-    <!-- Нижние кнопки навигации -->
-    <div class="bottom-nav-buttons">
-        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Вверх" class="up-button">
-            ↑
-        </button>
-        <button onclick="showScreen('user-selection-screen')" title="На главную" class="home-button">
-            ⌂
-        </button>
-    </div>
-
-    <!-- Скрипты -->
-    <script src="js/main.js"></script>
-    <script src="js/customer.js"></script>
-    <script src="js/farmer.js"></script>
-    <script src="js/admin.js"></script>
-    <script src="components/navigation.js"></script>
-    <script src="components/common.js"></script>
-    
-    <script>
-        // Загрузка компонентов при запуске
-        document.addEventListener('DOMContentLoaded', function() {
-            loadScreenContent('customer-screen', 'components/customer-screen.html');
-            loadScreenContent('farmer-screen', 'components/farmer-screen.html');
-            loadScreenContent('admin-screen', 'components/admin-screen.html');
-        });
-    </script>
-</body>
-</html>
+        <header>
+            <h1>Фермерский рынок выходного дня</h1>
+        </header>
+        <nav>
+            <button onclick="showCustomerTab('markets')" class="active" id="markets-tab-btn">Рынки</button>
+            <button onclick="showCustomerTab('catalog')" id="catalog-tab-btn">Каталог товаров</button>
+            <button onclick="showCustomerTab('farmers')" id="farmers-tab-btn">Фермеры</button>
+            <button onclick="showCustomerTab('cart')" id="cart-tab-btn">Корзина <span class="badge">3</span></button>
+            <button onclick="showCustomerTab('orders')" id="orders-tab-btn">Мои заказы</button>
+        </nav>
+        <main>
+            <!-- Вкладка Рынки -->
+            <div id="markets-tab" class="tab-content active">
+                <h2>Предстоящие рынки выходного дня</h2>
+                <div class="market-date">
+                    <div class="market-info">
+                        <h3>Суббота, 15 марта 2025</h3>
+                        <p>Площадь Ленина, 10:00 - 16:00</p>
+                        <p>Участвуют 15 фермеров</p>
+                    </div>
+                    <div class="market-actions">
+                        <button onclick="showCustomerTab('catalog')">Просмотреть товары</button>
+                    </div>
+                </div>
+                <div class="market-date">
+                    <div class="market-info">
+                        <h3>Воскресенье, 16 марта 2025</h3>
+                        <p>Парк Горького, 10:00 - 18:00</p>
+                        <p>Участвуют 20 фермеров</p>
+                    </div>
+                    <div class="market-actions">
+                        <button onclick="showCustomerTab('catalog')">Просмотреть товары</button>
+                    </div>
+                </div>
+                <div class="market-date">
+                    <div class="market-info">
+                        <h3>Суббота, 22 марта 2025</h3>
+                        <p>Площадь Ленина, 10:00 - 16:00</p>
+                        <p>Участвуют 17 фермеров</p>
+                    </div>
+                    <div class="market-actions">
+                        <button onclick="showCustomerTab('catalog')">Просмотреть товары</button>
+                    </div>
+                </div>
+                
+                <h2 style="margin-top: 2rem;">Актуальные акции</h2>
+                <div class="product-grid">
+                    <div class="product-card">
+                        <div class="product-image" style="position: relative;">
+                            Мёд
+                            <div style="position: absolute; top: 10px; right: 10px; background-color: #f44336; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold;">-30%</div>
+                        </div>
+                        <div class="product-info">
+                            <h3>Мёд цветочный</h3>
+                            <p class="product-farm">Хозяйство "Медовый рай"</p>
+                            <p class="product-price"><span style="text-decoration: line-through; color: #999;">600 ₽</span> 420 ₽ за 1 кг</p>
+                            <p style="font-size: 0.8rem; color: #f44336; margin-top: 5px;">Акция действует 15.03.2025 на рынке на Площади Ленина</p>
+                            <div class="product-actions">
+                                <button onclick="addToCart()">В корзину</button>
+                                <button onclick="alert('Информация о товаре: Цветочный мёд, сбор лето 2024. Последние 10 кг по акции!')">i</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image" style="position: relative;">
+                            Сыр
+                            <div style="position: absolute; top: 10px; right: 10px; background-color: #f44336; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold;">-25%</div>
+                        </div>
+                        <div class="product-info">
+                            <h3>Сыр Адыгейский</h3>
+                            <p class="product-farm">Ферма "Зеленый луг"</p>
+                            <p class="product-price"><span style="text-decoration: line-through; color: #999;">480 ₽</span> 360 ₽ за 500 г</p>
+                            <p style="font-size: 0.8rem; color: #f44336; margin-top: 5px;">Акция действует 16.03.2025 на рынке в Парке Горького</p>
+                            <div class="product-actions">
+                                <button onclick="addToCart()">В корзину</button>
+                                <button onclick="alert('Информация о товаре: Домашний адыгейский сыр из цельного молока. Мягкий, нежный.')">i</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image" style="position: relative;">
+                            Яблоки
+                            <div style="position: absolute; top: 10px; right: 10px; background-color: #f44336; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold;">2+1</div>
+                        </div>
+                        <div class="product-info">
+                            <h3>Яблоки Антоновка</h3>
+                            <p class="product-farm">Эко-ферма "Родник"</p>
+                            <p class="product-price">180 ₽ за 1 кг</p>
+                            <p style="font-size: 0.8rem; color: #f44336; margin-top: 5px;">При покупке 2 кг — 3-й кг в подарок! 15.03.2025, Площадь Ленина</p>
+                            <div class="product-actions">
+                                <button onclick="addToCart()">В корзину</button>
+                                <button onclick="alert('Информация о товаре: Яблоки сорта Антоновка, без обработки химикатами. Акция: при покупке 2 кг третий кг — бесплатно!')">i</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладка Каталог -->
+            <div id="catalog-tab" class="tab-content">
+                <h2>Каталог товаров</h2>
+                <div class="filter-bar">
+                    <select>
+                        <option>Все категории</option>
+                        <option>Молочные продукты</option>
+                        <option>Мясо</option>
+                        <option>Овощи</option>
+                        <option>Фрукты</option>
+                        <option>Выпечка</option>
+                        <option>Мёд</option>
+                    </select>
+                    <select>
+                        <option>Все фермеры</option>
+                        <option>Ферма "Зеленый луг"</option>
+                        <option>Эко-ферма "Родник"</option>
+                        <option>Хозяйство "Медовый рай"</option>
+                    </select>
+                    <input type="text" placeholder="Поиск товаров...">
+                </div>
+                <div class="product-grid">
+                    <div class="product-card">
+                        <div class="product-image">Молоко</div>
+                        <div class="product-info">
+                            <h3>Молоко фермерское</h3>
+                            <p class="product-farm">Ферма "Зеленый луг"</p>
+                            <p class="product-price">150 ₽ за 1 л</p>
+                            <div class="product-actions">
+                                <button onclick="addToCart()">В корзину</button>
+                                <button onclick="alert('Информация о товаре: Мраморная говядина, травяной откорм')">i</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">Хлеб</div>
+                        <div class="product-info">
+                            <h3>Хлеб на закваске</h3>
+                            <p class="product-farm">Ферма "Зеленый луг"</p>
+                            <p class="product-price">150 ₽ за 1 шт</p>
+                            <div class="product-actions">
+                                <button onclick="addToCart()">В корзину</button>
+                                <button onclick="alert('Информация о товаре: Цельнозерновой хлеб на натуральной закваске')">i</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладка Фермеры -->
+            <div id="farmers-tab" class="tab-content">
+                <h2>Фермеры на рынке</h2>
+                <div class="farm-card">
+                    <div class="farm-image">Фото</div>
+                    <div class="farm-info">
+                        <h3>Ферма "Зеленый луг"</h3>
+                        <p>Специализация: молочные продукты, выпечка</p>
+                        <p>Расположение: 30 км от города</p>
+                        <p><strong>Присутствует на рынках:</strong> 15.03, 16.03, 22.03</p>
+                        <button onclick="showCustomerTab('catalog')">Посмотреть товары</button>
+                    </div>
+                </div>
+                <div class="farm-card">
+                    <div class="farm-image">Фото</div>
+                    <div class="farm-info">
+                        <h3>Эко-ферма "Родник"</h3>
+                        <p>Специализация: овощи, фрукты, мясо</p>
+                        <p>Расположение: 45 км от города</p>
+                        <p><strong>Присутствует на рынках:</strong> 15.03, 22.03</p>
+                        <button onclick="showCustomerTab('catalog')">Посмотреть товары</button>
+                    </div>
+                </div>
+                <div class="farm-card">
+                    <div class="farm-image">Фото</div>
+                    <div class="farm-info">
+                        <h3>Хозяйство "Медовый рай"</h3>
+                        <p>Специализация: мёд и продукты пчеловодства</p>
+                        <p>Расположение: 50 км от города</p>
+                        <p><strong>Присутствует на рынках:</strong> 15.03, 16.03, 22.03</p>
+                        <button onclick="showCustomerTab('catalog')">Посмотреть товары</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладка Корзина -->
+            <div id="cart-tab" class="tab-content">
+                <h2>Корзина</h2>
+                <div class="card">
+                    <div class="cart-item">
+                        <div class="farm-image">Молоко</div>
+                        <div class="cart-item-info">
+                            <h3>Молоко фермерское</h3>
+                            <p class="cart-item-farm">Ферма "Зеленый луг"</p>
+                            <p class="product-price">150 ₽ за 1 л</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button onclick="updateQuantity(this, -1)">-</button>
+                            <span>2</span>
+                            <button onclick="updateQuantity(this, 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="cart-item">
+                        <div class="farm-image">Творог</div>
+                        <div class="cart-item-info">
+                            <h3>Творог домашний</h3>
+                            <p class="cart-item-farm">Ферма "Зеленый луг"</p>
+                            <p class="product-price">250 ₽ за 500 г</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button onclick="updateQuantity(this, -1)">-</button>
+                            <span>1</span>
+                            <button onclick="updateQuantity(this, 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="cart-item">
+                        <div class="farm-image">Мёд</div>
+                        <div class="cart-item-info">
+                            <h3>Мёд цветочный</h3>
+                            <p class="cart-item-farm">Хозяйство "Медовый рай"</p>
+                            <p class="product-price">600 ₽ за 1 кг</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button onclick="updateQuantity(this, -1)">-</button>
+                            <span>1</span>
+                            <button onclick="updateQuantity(this, 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-summary">
+                    <div class="cart-total">
+                        <span>Итого:</span>
+                        <span>1150 ₽</span>
+                    </div>
+                    <p><strong>Рынок для получения заказа:</strong> Суббота, 15 марта 2025, Площадь Ленина</p>
+                    <button onclick="submitOrder()">Оформить заказ</button>
+                </div>
+            </div>
+            
+            <!-- Вкладка Мои заказы -->
+            <div id="orders-tab" class="tab-content">
+                <h2>Мои заказы</h2>
+                <div class="order-list-item">
+                    <div>
+                        <p class="order-customer">Заказ #1001 от 10.03.2025</p>
+                        <p>3 товара на сумму 1150 ₽</p>
+                        <p>Получение: Суббота, 15 марта 2025, Площадь Ленина</p>
+                    </div>
+                    <div>
+                        <span class="order-status confirmed">Подтвержден</span>
+                    </div>
+                </div>
+                <div class="order-list-item">
+                    <div>
+                        <p class="order-customer">Заказ #998 от 01.03.2025</p>
+                        <p>5 товаров на сумму 1850 ₽</p>
+                        <p>Получение: Суббота, 08 марта 2025, Площадь Ленина</p>
+                    </div>
+                    <div>
+                        <span class="order-status">Выполнен</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Экран подтверждения заказа -->
+            <div id="order-success" class="tab-content">
+                <div class="order-success">
+                    <h2>Заказ успешно оформлен!</h2>
+                    <p>Ваш заказ #1002 принят и передан фермерам.</p>
+                    <p>Вы можете забрать его в субботу, 15 марта 2025 на Площади Ленина с 10:00 до 16:00.</p>
+                    <p>За день до рынка вам придет СМС с напоминанием.</p>
+                    <button class="back-button" onclick="showCustomerTab('markets')">Вернуться на главную</button>
+                </div>
+            </div: Свежее молоко, жирность 4.5%, пастеризованное')">i</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">Творог</div>
+                        <div class="product-info">
+                            <h3>Творог домашний</h3>
+                            <p class="product-farm">Ферма "Зеленый луг"</p>
+                            <p class="product-price">250 ₽ за 500 г</p>
+                            <div class="product-actions">
+                                <button onclick="addToCart()">В корзину</button>
+                                <button onclick="alert('Информация о товаре: Домашний творог из цельного молока, жирность 9%')">i</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">Мёд</div>
+                        <div class="product-info">
+                            <h3>Мёд цветочный</h3>
+                            <p class="product-farm">Хозяйство "Медовый рай"</p>
+                            <p class="product-price">600 ₽ за 1 кг</p>
+                            <div class="product-actions">
+                                <button onclick="addToCart()">В корзину</button>
+                                <button onclick="alert('Информация о товаре: Цветочный мёд, сбор лето 2024')">i</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">Яблоки</div>
+                        <div class="product-info">
+                            <h3>Яблоки Антоновка</h3>
+                            <p class="product-farm">Эко-ферма "Родник"</p>
+                            <p class="product-price">180 ₽ за 1 кг</p>
+                            <div class="product-actions">
+                                <button onclick="addToCart()">В корзину</button>
+                                <button onclick="alert('Информация о товаре: Яблоки сорта Антоновка, без обработки химикатами')">i</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">Говядина</div>
+                        <div class="product-info">
+                            <h3>Говядина фермерская</h3>
+                            <p class="product-farm">Эко-ферма "Родник"</p>
+                            <p class="product-price">650 ₽ за 1 кг</p>
+                            <div class="product-actions">
+                                <button onclick="addToCart()">В корзину</button>
+                                <button onclick="alert('Информация о товаре: Мраморная говядина, травяной откорм')">i</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="product-card">
+                                                        <div class="product-image">Хлеб</div>
+                                                        <div class="product-info">
+                                                            <h3>Хлеб на закваске</h3>
+                                                            <p class="product-farm">Ферма "Зеленый луг"</p>
+                                                            <p class="product-price">150 ₽ за 1 шт</p>
+                                                            <div class="product-actions">
+                                                                <button onclick="addToCart()">В корзину</button>
+                                                                <button onclick="alert('Информация о товаре: Цельнозерновой хлеб на натуральной закваске')">i</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Фермеры -->
+                                            <div id="farmers-tab" class="tab-content">
+                                                <h2>Фермеры на рынке</h2>
+                                                <div class="farm-card">
+                                                    <div class="farm-image">Фото</div>
+                                                    <div class="farm-info">
+                                                        <h3>Ферма "Зеленый луг"</h3>
+                                                        <p>Специализация: молочные продукты, выпечка</p>
+                                                        <p>Расположение: 30 км от города</p>
+                                                        <p><strong>Присутствует на рынках:</strong> 15.03, 16.03, 22.03</p>
+                                                        <button onclick="showCustomerTab('catalog')">Посмотреть товары</button>
+                                                    </div>
+                                                </div>
+                                                <div class="farm-card">
+                                                    <div class="farm-image">Фото</div>
+                                                    <div class="farm-info">
+                                                        <h3>Эко-ферма "Родник"</h3>
+                                                        <p>Специализация: овощи, фрукты, мясо</p>
+                                                        <p>Расположение: 45 км от города</p>
+                                                        <p><strong>Присутствует на рынках:</strong> 15.03, 22.03</p>
+                                                        <button onclick="showCustomerTab('catalog')">Посмотреть товары</button>
+                                                    </div>
+                                                </div>
+                                                <div class="farm-card">
+                                                    <div class="farm-image">Фото</div>
+                                                    <div class="farm-info">
+                                                        <h3>Хозяйство "Медовый рай"</h3>
+                                                        <p>Специализация: мёд и продукты пчеловодства</p>
+                                                        <p>Расположение: 50 км от города</p>
+                                                        <p><strong>Присутствует на рынках:</strong> 15.03, 16.03, 22.03</p>
+                                                        <button onclick="showCustomerTab('catalog')">Посмотреть товары</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Корзина -->
+                                            <div id="cart-tab" class="tab-content">
+                                                <h2>Корзина</h2>
+                                                <div class="card">
+                                                    <div class="cart-item">
+                                                        <div class="farm-image">Молоко</div>
+                                                        <div class="cart-item-info">
+                                                            <h3>Молоко фермерское</h3>
+                                                            <p class="cart-item-farm">Ферма "Зеленый луг"</p>
+                                                            <p class="product-price">150 ₽ за 1 л</p>
+                                                        </div>
+                                                        <div class="cart-item-actions">
+                                                            <button onclick="updateQuantity(this, -1)">-</button>
+                                                            <span>2</span>
+                                                            <button onclick="updateQuantity(this, 1)">+</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="cart-item">
+                                                        <div class="farm-image">Творог</div>
+                                                        <div class="cart-item-info">
+                                                            <h3>Творог домашний</h3>
+                                                            <p class="cart-item-farm">Ферма "Зеленый луг"</p>
+                                                            <p class="product-price">250 ₽ за 500 г</p>
+                                                        </div>
+                                                        <div class="cart-item-actions">
+                                                            <button onclick="updateQuantity(this, -1)">-</button>
+                                                            <span>1</span>
+                                                            <button onclick="updateQuantity(this, 1)">+</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="cart-item">
+                                                        <div class="farm-image">Мёд</div>
+                                                        <div class="cart-item-info">
+                                                            <h3>Мёд цветочный</h3>
+                                                            <p class="cart-item-farm">Хозяйство "Медовый рай"</p>
+                                                            <p class="product-price">600 ₽ за 1 кг</p>
+                                                        </div>
+                                                        <div class="cart-item-actions">
+                                                            <button onclick="updateQuantity(this, -1)">-</button>
+                                                            <span>1</span>
+                                                            <button onclick="updateQuantity(this, 1)">+</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="cart-summary">
+                                                    <div class="cart-total">
+                                                        <span>Итого:</span>
+                                                        <span>1150 ₽</span>
+                                                    </div>
+                                                    <p><strong>Рынок для получения заказа:</strong> Суббота, 15 марта 2025, Площадь Ленина</p>
+                                                    <button onclick="submitOrder()">Оформить заказ</button>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Мои заказы -->
+                                            <div id="orders-tab" class="tab-content">
+                                                <h2>Мои заказы</h2>
+                                                <div class="order-list-item">
+                                                    <div>
+                                                        <p class="order-customer">Заказ #1001 от 10.03.2025</p>
+                                                        <p>3 товара на сумму 1150 ₽</p>
+                                                        <p>Получение: Суббота, 15 марта 2025, Площадь Ленина</p>
+                                                    </div>
+                                                    <div>
+                                                        <span class="order-status confirmed">Подтвержден</span>
+                                                    </div>
+                                                </div>
+                                                <div class="order-list-item">
+                                                    <div>
+                                                        <p class="order-customer">Заказ #998 от 01.03.2025</p>
+                                                        <p>5 товаров на сумму 1850 ₽</p>
+                                                        <p>Получение: Суббота, 08 марта 2025, Площадь Ленина</p>
+                                                    </div>
+                                                    <div>
+                                                        <span class="order-status">Выполнен</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Экран подтверждения заказа -->
+                                            <div id="order-success" class="tab-content">
+                                                <div class="order-success">
+                                                    <h2>Заказ успешно оформлен!</h2>
+                                                    <p>Ваш заказ #1002 принят и передан фермерам.</p>
+                                                    <p>Вы можете забрать его в субботу, 15 марта 2025 на Площади Ленина с 10:00 до 16:00.</p>
+                                                    <p>За день до рынка вам придет СМС с напоминанием.</p>
+                                                    <button class="back-button" onclick="showCustomerTab('markets')">Вернуться на главную</button>
+                                                </div>
+                                            </div>
+                                        </main>
+                                    </div>
+                                    
+                                    <!-- Основной экран фермера -->
+                                    <div id="farmer-screen" class="screen">
+                                        <header>
+                                            <h1>Фермерский рынок выходного дня - Панель фермера</h1>
+                                        </header>
+                                        <nav>
+                                            <button onclick="showFarmerTab('dashboard')" class="active" id="dashboard-tab-btn">Статистика</button>
+                                            <button onclick="showFarmerTab('products')" id="products-tab-btn">Товары</button>
+                                            <button onclick="showFarmerTab('farmer-orders')" id="farmer-orders-tab-btn">Заказы <span class="badge">2</span></button>
+                                            <button onclick="showFarmerTab('schedule')" id="schedule-tab-btn">Расписание</button>
+                                            <button onclick="showFarmerTab('profile')" id="profile-tab-btn">Профиль</button>
+                                        </nav>
+                                        <main>
+                                            <!-- Вкладка Статистика -->
+                                            <div id="dashboard-tab" class="tab-content active">
+                                                <h2>Статистика фермы "Зеленый луг"</h2>
+                                                <div class="farmer-dashboard">
+                                                    <div class="stat-card">
+                                                        <p>Продажи за март</p>
+                                                        <p class="stat-value">45 800 ₽</p>
+                                                    </div>
+                                                    <div class="stat-card">
+                                                        <p>Активных заказов</p>
+                                                        <p class="stat-value">15</p>
+                                                    </div>
+                                                    <div class="stat-card">
+                                                        <p>Товаров в каталоге</p>
+                                                        <p class="stat-value">18</p>
+                                                    </div>
+                                                    <div class="stat-card">
+                                                        <p>Постоянных клиентов</p>
+                                                        <p class="stat-value">56</p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <h3>Предстоящие рынки</h3>
+                                                <div class="market-date">
+                                                    <div class="market-info">
+                                                        <h3>Суббота, 15 марта 2025</h3>
+                                                        <p>Площадь Ленина, 10:00 - 16:00</p>
+                                                        <p>Заказов: 10</p>
+                                                    </div>
+                                                    <div class="market-actions">
+                                                        <button onclick="showFarmerTab('farmer-orders')">Просмотреть заказы</button>
+                                                    </div>
+                                                </div>
+                                                <div class="market-date">
+                                                    <div class="market-info">
+                                                        <h3>Воскресенье, 16 марта 2025</h3>
+                                                        <p>Парк Горького, 10:00 - 18:00</p>
+                                                        <p>Заказов: 5</p>
+                                                    </div>
+                                                    <div class="market-actions">
+                                                        <button onclick="showFarmerTab('farmer-orders')">Просмотреть заказы</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Товары -->
+                                            <div id="products-tab" class="tab-content">
+                                                <h2>Мои товары</h2>
+                                                <button style="margin-bottom: 1rem; background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">+ Добавить товар</button>
+                                                
+                                                <div class="tabs">
+                                                    <div class="tab active" onclick="showProductsSubTab('active-products')">Активные</div>
+                                                    <div class="tab" onclick="showProductsSubTab('draft-products')">Черновики</div>
+                                                    <div class="tab" onclick="showProductsSubTab('sold-products')">Распроданные</div>
+                                                </div>
+                                                
+                                                <div id="active-products" class="tab-content active">
+                                                    <div class="product-grid">
+                                                        <div class="product-card">
+                                                            <div class="product-image">Молоко</div>
+                                                            <div class="product-info">
+                                                                <h3>Молоко фермерское</h3>
+                                                                <p class="product-price">150 ₽ за 1 л</p>
+                                                                <p>В наличии: 50 л</p>
+                                                                <div class="product-actions">
+                                                                    <button onclick="alert('Редактирование товара')">Редактировать</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="product-card">
+                                                            <div class="product-image">Творог</div>
+                                                            <div class="product-info">
+                                                                <h3>Творог домашний</h3>
+                                                                <p class="product-price">250 ₽ за 500 г</p>
+                                                                <p>В наличии: 30 уп.</p>
+                                                                <div class="product-actions">
+                                                                    <button onclick="alert('Редактирование товара')">Редактировать</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="product-card">
+                                                            <div class="product-image">Хлеб</div>
+                                                            <div class="product-info">
+                                                                <h3>Хлеб на закваске</h3>
+                                                                <p class="product-price">150 ₽ за 1 шт</p>
+                                                                <p>В наличии: 25 шт.</p>
+                                                                <div class="product-actions">
+                                                                    <button onclick="alert('Редактирование товара')">Редактировать</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div id="draft-products" class="tab-content">
+                                                    <p>У вас нет товаров в черновиках.</p>
+                                                </div>
+                                                
+                                                <div id="sold-products" class="tab-content">
+                                                    <div class="product-card">
+                                                        <div class="product-image">Сметана</div>
+                                                        <div class="product-info">
+                                                            <h3>Сметана домашняя</h3>
+                                                            <p class="product-price">180 ₽ за 300 г</p>
+                                                            <p>Статус: распродано</p>
+                                                            <div class="product-actions">
+                                                                <button onclick="alert('Товар добавлен в активные')">Восстановить</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Заказы фермера -->
+                                            <div id="farmer-orders-tab" class="tab-content">
+                                                <h2>Заказы на мои товары</h2>
+                                                
+                                                <div class="tabs">
+                                                    <div class="tab active" onclick="showOrdersSubTab('pending-orders')">Новые (2)</div>
+                                                    <div class="tab" onclick="showOrdersSubTab('confirmed-orders')">Подтвержденные (13)</div>
+                                                    <div class="tab" onclick="showOrdersSubTab('completed-orders')">Выполненные</div>
+                                                </div>
+                                                
+                                                <div id="pending-orders" class="tab-content active">
+                                                    <div class="order-list-item">
+                                                        <div>
+                                                            <p class="order-customer">Иван П., тел. +7 (999) 123-45-67</p>
+                                                            <p>Заказ #1002 от 08.03.2025</p>
+                                                            <p>Товары: Молоко фермерское (2 л), Творог домашний (1 уп.)</p>
+                                                            <p>Сумма: 550 ₽</p>
+                                                            <p>Получение: Суббота, 15 марта 2025, Площадь Ленина</p>
+                                                        </div>
+                                                        <div>
+                                                            <span class="order-status pending">Новый</span>
+                                                            <div style="margin-top: 1rem;">
+                                                                <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Подтвердить</button>
+                                                                <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отклонить</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="order-list-item">
+                                                        <div>
+                                                            <p class="order-customer">Анна К., тел. +7 (999) 987-65-43</p>
+                                                            <p>Заказ #1001 от 08.03.2025</p>
+                                                            <p>Товары: Хлеб на закваске (2 шт.)</p>
+                                                            <p>Сумма: 300 ₽</p>
+                                                            <p>Получение: Суббота, 15 марта 2025, Площадь Ленина</p>
+                                                        </div>
+                                                        <div>
+                                                            <span class="order-status pending">Новый</span>
+                                                            <div style="margin-top: 1rem;">
+                                                                <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Подтвердить</button>
+                                                                <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отклонить</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div id="confirmed-orders" class="tab-content">
+                                                    <div class="order-list-item">
+                                                        <div>
+                                                            <p class="order-customer">Петр С., тел. +7 (999) 111-22-33</p>
+                                                            <p>Заказ #998 от 05.03.2025</p>
+                                                            <p>Товары: Молоко фермерское (3 л), Творог домашний (2 уп.)</p>
+                                                            <p>Сумма: 950 ₽</p>
+                                                            <p>Получение: Суббота, 15 марта 2025, Площадь Ленина</p>
+                                                        </div>
+                                                        <div>
+                                                            <span class="order-status confirmed">Подтвержден</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div id="completed-orders" class="tab-content">
+                                                    <p>Здесь будут отображаться выполненные заказы.</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Расписание -->
+                                            <div id="schedule-tab" class="tab-content">
+                                                <h2>Расписание рынков</h2>
+                                                
+                                                <div class="market-date">
+                                                    <div class="market-info">
+                                                        <h3>Суббота, 15 марта 2025</h3>
+                                                        <p>Площадь Ленина, 10:00 - 16:00</p>
+                                                        <p>Участвуют 15 фермеров</p>
+                                                        <p><strong>Статус:</strong> Участие подтверждено</p>
+                                                    </div>
+                                                    <div class="market-actions">
+                                                        <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отменить участие</button>
+                                                    </div>
+                                                </div>
+                                                <div class="market-date">
+                                                    <div class="market-info">
+                                                        <h3>Воскресенье, 16 марта 2025</h3>
+                                                        <p>Парк Горького, 10:00 - 18:00</p>
+                                                        <p>Участвуют 20 фермеров</p>
+                                                        <p><strong>Статус:</strong> Участие подтверждено</p>
+                                                    </div>
+                                                    <div class="market-actions">
+                                                        <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отменить участие</button>
+                                                    </div>
+                                                </div>
+                                                <div class="market-date">
+                                                    <div class="market-info">
+                                                        <h3>Суббота, 22 марта 2025</h3>
+                                                        <p>Площадь Ленина, 10:00 - 16:00</p>
+                                                        <p>Участвуют 17 фермеров</p>
+                                                        <p><strong>Статус:</strong> Требуется подтверждение</p>
+                                                    </div>
+                                                    <div class="market-actions">
+                                                        <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Подтвердить</button>
+                                                        <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отклонить</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Профиль фермера -->
+                                            <div id="profile-tab" class="tab-content">
+                                                <h2>Профиль фермы</h2>
+                                                <div class="card">
+                                                    <form>
+                                                        <div class="form-group">
+                                                            <label for="farm-name">Название фермы</label>
+                                                            <input type="text" id="farm-name" value="Ферма &quot;Зеленый луг&quot;">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="farm-specialty">Специализация</label>
+                                                            <input type="text" id="farm-specialty" value="Молочные продукты, выпечка">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="farm-description">Описание</label>
+                                                            <textarea id="farm-description" rows="4" style="width: 100%; padding: 0.5rem; border: 1px solid var(--medium-grey); border-radius: 4px;">Семейная ферма с традициями. Наши коровы питаются только экологически чистыми кормами. Производим натуральные молочные продукты и домашнюю выпечку.</textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="farm-location">Расположение</label>
+                                                            <input type="text" id="farm-location" value="30 км от города">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="farm-phone">Контактный телефон</label>
+                                                            <input type="tel" id="farm-phone" value="+7 (999) 123-45-67">
+                                                        </div>
+                                                        <button type="button" style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem;" onclick="alert('Профиль сохранен')">Сохранить изменения</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </main>
+                                    </div>
+                                    
+                                    <!-- Основной экран администратора рынка -->
+                                    <div id="admin-screen" class="screen">
+                                        <header>
+                                            <h1>Фермерский рынок выходного дня - Панель администратора</h1>
+                                        </header>
+                                        <nav>
+                                            <button onclick="showAdminTab('admin-dashboard')" class="active" id="admin-dashboard-tab-btn">Общая статистика</button>
+                                            <button onclick="showAdminTab('admin-markets')" id="admin-markets-tab-btn">Управление рынками</button>
+                                            <button onclick="showAdminTab('admin-farmers')" id="admin-farmers-tab-btn">Фермеры</button>
+                                            <button onclick="showAdminTab('admin-customers')" id="admin-customers-tab-btn">Клиенты</button>
+                                            <button onclick="showAdminTab('admin-settings')" id="admin-settings-tab-btn">Настройки</button>
+                                        </nav>
+                                        <main>
+                                            <!-- Вкладка Общая статистика -->
+                                            <div id="admin-dashboard-tab" class="tab-content active">
+                                                <h2>Общая статистика платформы</h2>
+                                                <div class="farmer-dashboard">
+                                                    <div class="stat-card">
+                                                        <p>Оборот за март</p>
+                                                        <p class="stat-value">387 500 ₽</p>
+                                                    </div>
+                                                    <div class="stat-card">
+                                                        <p>Активных фермеров</p>
+                                                        <p class="stat-value">23</p>
+                                                    </div>
+                                                    <div class="stat-card">
+                                                        <p>Клиентов</p>
+                                                        <p class="stat-value">452</p>
+                                                    </div>
+                                                    <div class="stat-card">
+                                                        <p>Заказов в этом месяце</p>
+                                                        <p class="stat-value">204</p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <h3>Ближайшие рынки</h3>
+                                                <div class="market-date">
+                                                    <div class="market-info">
+                                                        <h3>Суббота, 15 марта 2025</h3>
+                                                        <p>Площадь Ленина, 10:00 - 16:00</p>
+                                                        <p>Участвуют 15 фермеров, 87 предзаказов</p>
+                                                    </div>
+                                                    <div class="market-actions">
+                                                        <button onclick="showAdminTab('admin-markets')">Подробнее</button>
+                                                    </div>
+                                                </div>
+                                                <div class="market-date">
+                                                    <div class="market-info">
+                                                        <h3>Воскресенье, 16 марта 2025</h3>
+                                                        <p>Парк Горького, 10:00 - 18:00</p>
+                                                        <p>Участвуют 20 фермеров, 64 предзаказа</p>
+                                                    </div>
+                                                    <div class="market-actions">
+                                                        <button onclick="showAdminTab('admin-markets')">Подробнее</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Управление рынками -->
+                                            <div id="admin-markets-tab" class="tab-content">
+                                                <h2>Управление рынками</h2>
+                                                <button style="margin-bottom: 1rem; background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">+ Создать новый рынок</button>
+                                                
+                                                <div class="tabs">
+                                                    <div class="tab active" onclick="showMarketSubTab('upcoming-markets')">Предстоящие</div>
+                                                    <div class="tab" onclick="showMarketSubTab('past-markets')">Прошедшие</div>
+                                                </div>
+                                                
+                                                <div id="upcoming-markets" class="tab-content active">
+                                                    <div class="market-date">
+                                                        <div class="market-info">
+                                                            <h3>Суббота, 15 марта 2025</h3>
+                                                            <p>Площадь Ленина, 10:00 - 16:00</p>
+                                                            <p>Участвуют 15 фермеров, 87 предзаказов</p>
+                                                        </div>
+                                                        <div class="market-actions">
+                                                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                                                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отменить</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="market-date">
+                                                        <div class="market-info">
+                                                            <h3>Воскресенье, 16 марта 2025</h3>
+                                                            <p>Парк Горького, 10:00 - 18:00</p>
+                                                            <p>Участвуют 20 фермеров, 64 предзаказа</p>
+                                                        </div>
+                                                        <div class="market-actions">
+                                                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                                                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отменить</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="market-date">
+                                                        <div class="market-info">
+                                                            <h3>Суббота, 22 марта 2025</h3>
+                                                            <p>Площадь Ленина, 10:00 - 16:00</p>
+                                                            <p>Участвуют 17 фермеров, 42 предзаказа</p>
+                                                        </div>
+                                                        <div class="market-actions">
+                                                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                                                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отменить</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div id="past-markets" class="tab-content">
+                                                    <div class="market-date">
+                                                        <div class="market-info">
+                                                            <h3>Суббота, 8 марта 2025</h3>
+                                                            <p>Площадь Ленина, 10:00 - 16:00</p>
+                                                            <p>Участвовало 18 фермеров, 92 заказа</p>
+                                                            <p><strong>Оборот:</strong> 124 500 ₽</p>
+                                                        </div>
+                                                        <div class="market-actions">
+                                                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Отчёт</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Фермеры -->
+                                            <div id="admin-farmers-tab" class="tab-content">
+                                                <h2>Управление фермерами</h2>
+                                                <button style="margin-bottom: 1rem; background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">+ Добавить фермера</button>
+                                                
+                                                <div class="farm-card">
+                                                    <div class="farm-image">Фото</div>
+                                                    <div class="farm-info">
+                                                        <h3>Ферма "Зеленый луг"</h3>
+                                                        <p>Специализация: молочные продукты, выпечка</p>
+                                                        <p>Контакт: Иванов Иван, +7 (999) 123-45-67</p>
+                                                        <p><strong>Статус:</strong> Активный</p>
+                                                        <div style="display: flex; margin-top: 0.5rem;">
+                                                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                                                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Деактивировать</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="farm-card">
+                                                    <div class="farm-image">Фото</div>
+                                                    <div class="farm-info">
+                                                        <h3>Эко-ферма "Родник"</h3>
+                                                        <p>Специализация: овощи, фрукты, мясо</p>
+                                                        <p>Контакт: Петрова Анна, +7 (999) 987-65-43</p>
+                                                        <p><strong>Статус:</strong> Активный</p>
+                                                        <div style="display: flex; margin-top: 0.5rem;">
+                                                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                                                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Деактивировать</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="farm-card">
+                                                    <div class="farm-image">Фото</div>
+                                                    <div class="farm-info">
+                                                        <h3>Хозяйство "Медовый рай"</h3>
+                                                        <p>Специализация: мёд и продукты пчеловодства</p>
+                                                        <p>Контакт: Сидоров Алексей, +7 (999) 555-55-55</p>
+                                                        <p><strong>Статус:</strong> Активный</p>
+                                                        <div style="display: flex; margin-top: 0.5rem;">
+                                                            <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Редактировать</button>
+                                                            <button style="background-color: #f44336; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Деактивировать</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Клиенты -->
+                                            <div id="admin-customers-tab" class="tab-content">
+                                                <h2>База клиентов</h2>
+                                                <div class="filter-bar">
+                                                    <input type="text" placeholder="Поиск по имени или телефону...">
+                                                    <select>
+                                                        <option>Все клиенты</option>
+                                                        <option>Активные</option>
+                                                        <option>Новые</option>
+                                                        <option>Неактивные</option>
+                                                    </select>
+                                                    <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Применить</button>
+                                                </div>
+                                                
+                                                <div class="card" style="margin-top: 1rem;">
+                                                    <table style="width: 100%; border-collapse: collapse;">
+                                                        <thead>
+                                                            <tr style="background-color: var(--light-grey);">
+                                                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--medium-grey);">Имя</th>
+                                                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--medium-grey);">Телефон</th>
+                                                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--medium-grey);">Заказов</th>
+                                                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--medium-grey);">Сумма</th>
+                                                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--medium-grey);">Действия</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">Иван Петров</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">+7 (999) 123-45-67</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">15</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">18,750 ₽</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">
+                                                                    <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Профиль</button>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">Анна Кузнецова</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">+7 (999) 987-65-43</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">8</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">12,400 ₽</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">
+                                                                    <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Профиль</button>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">Петр Сидоров</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">+7 (999) 111-22-33</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">12</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">15,800 ₽</td>
+                                                                <td style="padding: 0.5rem; border-bottom: 1px solid var(--medium-grey);">
+                                                                    <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Профиль</button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Вкладка Настройки -->
+                                            <div id="admin-settings-tab" class="tab-content">
+                                                <h2>Настройки платформы</h2>
+                                                
+                                                <div class="card">
+                                                    <h3 class="card-title">Общие настройки</h3>
+                                                    <div class="form-group">
+                                                        <label for="platform-name">Название платформы</label>
+                                                        <input type="text" id="platform-name" value="Фермерский рынок выходного дня">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="platform-contact">Контактный телефон поддержки</label>
+                                                        <input type="tel" id="platform-contact" value="+7 (999) 999-99-99">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="platform-email">Email поддержки</label>
+                                                        <input type="email" id="platform-email" value="support@farmermarket.ru">
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="card">
+                                                    <h3 class="card-title">Настройки уведомлений</h3>
+                                                    <div class="form-group" style="display: flex; align-items: center;">
+                                                        <input type="checkbox" id="notify-new-market" checked style="margin-right: 0.5rem;">
+                                                        <label for="notify-new-market">Уведомлять о новых рынках</label>
+                                                    </div>
+                                                    <div class="form-group" style="display: flex; align-items: center;">
+                                                        <input type="checkbox" id="notify-orders" checked style="margin-right: 0.5rem;">
+                                                        <label for="notify-orders">Уведомлять о новых заказах</label>
+                                                    </div>
+                                                    <div class="form-group" style="display: flex; align-items: center;">
+                                                        <input type="checkbox" id="notify-reminder" checked style="margin-right: 0.5rem;">
+                                                        <label for="notify-reminder">Отправлять напоминания</label>
+                                                    </div>
+                                                </div>
+                                                
+                                                <button style="background-color: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem;" onclick="alert('Настройки сохранены')">Сохранить настройки</button>
+                                            </div>
+                                        </main>
+                                    </div>
+                                
+                                    <script>
+                                        // Переменная для хранения типа пользователя
+                                        let userType = '';
+                                        
+                                        // Функция для переключения экранов
+                                        function showScreen(screenId) {
+                                            document.querySelectorAll('.screen').forEach(screen => {
+                                                screen.classList.remove('active');
+                                            });
+                                            document.getElementById(screenId).classList.add('active');
+                                        }
+                                        
+                                        // Функция для установки типа пользователя
+                                        function setUserType(type) {
+                                            userType = type;
+                                            document.getElementById('login-title').textContent = `Вход для ${type === 'customer' ? 'покупателя' : type === 'farmer' ? 'фермера' : 'администратора'}`;
+                                        }
+                                        
+                                        // Функция для входа в систему
+                                        function login() {
+                                            if (userType === 'customer') {
+                                                showScreen('customer-screen');
+                                            } else if (userType === 'farmer') {
+                                                showScreen('farmer-screen');
+                                            } else if (userType === 'admin') {
+                                                showScreen('admin-screen');
+                                            }
+                                        }
+                                        
+                                        // Функции для работы с вкладками клиента
+                                        function showCustomerTab(tabId) {
+                                            // Сначала деактивируем все кнопки и вкладки
+                                            document.querySelectorAll('#customer-screen nav button').forEach(btn => {
+                                                btn.classList.remove('active');
+                                            });
+                                            document.querySelectorAll('#customer-screen .tab-content').forEach(tab => {
+                                                tab.classList.remove('active');
+                                            });
+                                            
+                                            // Затем активируем нужную кнопку и вкладку
+                                            document.getElementById(`${tabId}-tab-btn`).classList.add('active');
+                                            document.getElementById(`${tabId}-tab`).classList.add('active');
+                                            
+                                            // Отдельная обработка для успешного оформления заказа
+                                            if (tabId === 'order-success') {
+                                                document.getElementById('order-success').classList.add('active');
+                                            }
+                                        }
+                                        
+                                        // Функции для работы с вкладками фермера
+                                        function showFarmerTab(tabId) {
+                                            document.querySelectorAll('#farmer-screen nav button').forEach(btn => {
+                                                btn.classList.remove('active');
+                                            });
+                                            document.querySelectorAll('#farmer-screen .tab-content').forEach(tab => {
+                                                tab.classList.remove('active');
+                                            });
+                                            
+                                            document.getElementById(`${tabId}-tab-btn`).classList.add('active');
+                                            document.getElementById(`${tabId}-tab`).classList.add('active');
+                                        }
+                                        
+                                        // Функции для работы с подвкладками товаров
+                                        function showProductsSubTab(tabId) {
+                                            document.querySelectorAll('#products-tab .tab').forEach(tab => {
+                                                tab.classList.remove('active');
+                                            });
+                                            document.querySelectorAll('#products-tab .tab-content').forEach(content => {
+                                                content.classList.remove('active');
+                                            });
+                                            
+                                            event.target.classList.add('active');
+                                            document.getElementById(tabId).classList.add('active');
+                                        }
+                                        
+                                        // Функции для работы с подвкладками заказов
+                                        function showOrdersSubTab(tabId) {
+                                            document.querySelectorAll('#farmer-orders-tab .tab').forEach(tab => {
+                                                tab.classList.remove('active');
+                                            });
+                                            document.querySelectorAll('#farmer-orders-tab .tab-content').forEach(content => {
+                                                content.classList.remove('active');
+                                            });
+                                            
+                                            event.target.classList.add('active');
+                                            document.getElementById(tabId).classList.add('active');
+                                        }
+                                        
+                                        // Функции для работы с вкладками администратора
+                                        function showAdminTab(tabId) {
+                                            document.querySelectorAll('#admin-screen nav button').forEach(btn => {
+                                                btn.classList.remove('active');
+                                            });
+                                            document.querySelectorAll('#admin-screen .tab-content').forEach(tab => {
+                                                tab.classList.remove('active');
+                                            });
+                                            
+                                            document.getElementById(`${tabId}-tab-btn`).classList.add('active');
+                                            document.getElementById(`${tabId}-tab`).classList.add('active');
+                                        }
+                                        
+                                        // Функции для работы с подвкладками рынков
+                                        function showMarketSubTab(tabId) {
+                                            document.querySelectorAll('#admin-markets-tab .tab').forEach(tab => {
+                                                tab.classList.remove('active');
+                                            });
+                                            document.querySelectorAll('#admin-markets-tab .tab-content').forEach(content => {
+                                                content.classList.remove('active');
+                                            });
+                                            
+                                            event.target.classList.add('active');
+                                            document.getElementById(tabId).classList.add('active');
+                                        }
+                                        
+                                        // Функция для добавления товара в корзину
+                                        function addToCart() {
+                                            alert('Товар добавлен в корзину');
+                                        }
+                                        
+                                        // Функция для обновления количества товара в корзине
+                                        function updateQuantity(button, change) {
+                                            const quantityElement = button.parentElement.querySelector('span');
+                                            let quantity = parseInt(quantityElement.textContent);
+                                            
+                                            quantity += change;
+                                            if (quantity < 1) {
+                                                if (confirm('Удалить товар из корзины?')) {
+                                                    button.closest('.cart-item').remove();
+                                                } else {
+                                                    quantity = 1;
+                                                }
+                                            }
+                                            
+                                            quantityElement.textContent = quantity;
+                                        }
+                                        
+                                        // Функция для оформления заказа
+                                        function submitOrder() {
+                                            showCustomerTab('order-success');
+                                        }
+                                    </script>
+                                    <!-- Кнопка "На главную" в верхнем правом углу -->
+                                    <div style="position: fixed; top: 15px; right: 15px; z-index: 1000;">
+                                      <button 
+                                        onclick="showScreen('user-selection-screen')" 
+                                        style="background-color: #4caf50; color: white; border: none; border-radius: 4px; padding: 8px 15px; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); cursor: pointer;"
+                                        title="На главную">
+                                        На главную
+                                      </button>
+                                    </div>
+                                    
+                                    <!-- Нижние кнопки (в правом нижнем углу) -->
+                                    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px;">
+                                      <button 
+                                        onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+                                        style="background-color: #ff9800; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                                        title="Вверх">
+                                        ↑
+                                      </button>
+                                      <button 
+                                        onclick="showScreen('user-selection-screen')" 
+                                        style="background-color: #4caf50; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                                        title="На главную">
+                                        ⌂
+                                      </button>
+                                    </div>
+                                </body>
+                                </html>
